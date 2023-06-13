@@ -7,6 +7,18 @@ Isomorphic JavaScript logger with Bunyan and Sentry support.
 [![npm version](https://badge.fury.io/js/@haensl%2Fiso-log.svg)](http://badge.fury.io/js/@haensl%2Fiso-log)
 [![CircleCI](https://circleci.com/gh/haensl/iso-log.svg?style=svg)](https://circleci.com/gh/haensl/iso-log)
 
+iso-log is build with different runtime [environments](https://github.com/haensl/environments) and platforms (browser vs. Node.js) in mind:
+
+On the server:
+
+* iso-log uses [@haensl/log](https://github.com/haensl/log) in development and [bunyan](https://www.npmjs.com/package/bunyan) on QA and production environments. If Sentry configuration is provided, iso-log will use the [`@sentry/node`](https://www.npmjs.com/package/@sentry/node) package for crash reporting.
+
+On the client:
+
+* iso-log uses [@haensl/log](https://github.com/haensl/log). If Sentry configuration is provided, iso-log will use the [`@sentry/browser`](https://www.npmjs.com/package/@sentry/browser) package for crash reporting.
+
+**Attention:** Even though the package is named _"iso-"_ and has isomorphicity, i.e. use on both server and client, in mind, the code does not come transpiled for all platforms by default. This package is exposed as a CommonJS module. The code should, however, work without problems in ESM environments. Please [file a bug](https://github.com/haensl/iso-log/issues/new/?labels=bug) if it doesn't.
+
 ## Installation
 
 ### Via `npm`
@@ -87,9 +99,21 @@ const environments = require('@haensl/environments');
 // calls to log.error(), log.info(), log.debug(), etc are buffered until `init()` is called.
 
 log.init({
-  environment: environments.qa, // Set the environment your app runs in. String.
-  name: 'My log', // Provide a name for the log.
-  sentryConfig: { // Provide Sentry configuration.
+  // Set the environment your app runs in.
+  // String.
+  // If omitted, log behaves like on production.
+  environment: environments.qa,
+
+  // Provide a name for the log.
+  // String.
+  // Optional.
+  name: 'My log',
+
+  // Provide Sentry configuration.
+  // Object.
+  // Optional.
+  // This config object is handed to Sentry: `Sentry.init(sentryConfig)`
+  sentryConfig: {
     dsn: 'your sentry DSN here'
   }
 });
@@ -99,7 +123,29 @@ log.init({
 // log is now ready for use.
 ```
 
-## Features
+#### Runtime environment
+
+When calling `init()`, you can provide the runtime environment via the `environment` option:
+
+```javascript
+const log = require('@haensl/iso-log');
+
+log.init({
+  environment: 'development' // Set the environment your app runs in. String.
+});
+```
+
+Currently supported values are: `'development'`, `'qa'`, `'production'` and `'test'`.
+
+You can use [`@haensl/environments`](https://npmjs.com/package/@haensl/environments) for convenience.
+
+#### Platform
+
+iso-log determines the runtime platform by presence/absence of a global `window` object at the time `init()` is called:
+
+* `window` available -> browser
+* no `window` -> server
+
 
 ### Report errors and warnings to [Sentry](https://sentry.io)
 
