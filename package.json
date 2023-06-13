@@ -1,5 +1,5 @@
 {
-  "name": "iso-log",
+  "name": "@haensl/iso-log",
   "version": "1.0.0",
   "description": "Isomorphic logger with Bunyan and Sentry support.",
   "main": "index.js",
