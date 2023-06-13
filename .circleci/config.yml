@@ -199,8 +199,6 @@ jobs:
       - image: cimg/node:lts
     steps:
       - init
-      - attach_workspace:
-          at: ~/
       - package-test-setup
       - run:
           name: copy package test
