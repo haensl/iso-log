@@ -1,4 +1,4 @@
-# iso-log
+# @haensl/iso-log
 
 JavaScript logger with isomorphicity in mind.
 
