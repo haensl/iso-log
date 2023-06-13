@@ -88,8 +88,6 @@ commands:
   package-test-setup:
     steps:
       - prepare-repo
-      - attach_workspace:
-          at: ~/
       - create-test-project
       - run:
           name: install jest
@@ -218,7 +216,6 @@ jobs:
           name: test module
           working_directory: /tmp/test-app
           command: |
-            cat package.json
             npm test
 
   publish:
