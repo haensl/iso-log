@@ -202,7 +202,7 @@ jobs:
     steps:
       - init
       - attach_workspace:
-          at: ~/iso-log
+          at: ~/
       - package-test-setup
       - run:
           name: copy package test
