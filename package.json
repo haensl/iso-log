@@ -1,0 +1,78 @@
+{
+  "name": "iso-log",
+  "version": "1.0.0",
+  "description": "Isomorphic logger with Bunyan and Sentry support.",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint '**/*.js'",
+    "lint:junit": "eslint --format junit -o test-results/eslint/results.xml '**/*.js'",
+    "prepare": "if [ \"${NODE_ENV}\" != 'production' && -z \"${CI}\" ]; then husky install; fi",
+    "test": "jest --runInBand --no-cache --colors --passWithNoTests",
+    "test:junit": "jest --runInBand --no-cache --ci --reporters='default' --reporters='jest-junit' --passWithNoTests",
+    "tdd": "jest --runInBand --colors --watch"
+  },
+  "eslintConfig": {
+    "env": {
+      "node": true,
+      "jest": true,
+      "es6": true
+    },
+    "parserOptions": {
+      "ecmaVersion": 11
+    },
+    "extends": [
+      "@haensl"
+    ]
+  },
+  "jest": {
+    "modulePathIgnorePatterns": [
+      "package.test"
+    ],
+    "testPathIgnorePatterns": [
+      "/node_modules/"
+    ]
+  },
+  "jest-junit": {
+    "outputDirectory": "test-results/jest",
+    "outputName": "results.xml",
+    "suitName": "@haensl/iso-log unit tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/haensl/iso-log.git"
+  },
+  "keywords": [
+    "isomorphic",
+    "log",
+    "bunyan",
+    "sentry",
+    "console"
+  ],
+  "author": {
+    "name": "HP Dietz",
+    "url": "https://hpdietz.com",
+    "twitter": "@h_p_d",
+    "email": "h.p.dietz@gmail.com"
+  },
+  "funding": "https://github.com/sponsors/haensl",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/haensl/iso-log/issues"
+  },
+  "homepage": "https://github.com/haensl/iso-log#readme",
+  "dependencies": {
+    "@haensl/environments": "^1.0.1",
+    "@haensl/log": "^1.3.11",
+    "@haensl/services": "^1.4.6",
+    "@sentry/browser": "^7.54.0",
+    "@sentry/node": "^7.54.0",
+    "bunyan": "^1.8.15"
+  },
+  "devDependencies": {
+    "@haensl/eslint-config": "^1.4.6",
+    "eslint": "^8.42.0",
+    "husky": "^8.0.3",
+    "jest": "^29.5.0",
+    "jest-junit": "^16.0.0"
+  }
+}
