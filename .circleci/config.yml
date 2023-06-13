@@ -197,9 +197,13 @@ jobs:
   package-test:
     docker:
       - image: cimg/node:lts
+    working_directory: ~/iso-log
     steps:
       - init
       - package-test-setup
+      - run:
+          command: |
+            ls -lah
       - run:
           name: copy package test
           working_directory: /tmp/test-app
