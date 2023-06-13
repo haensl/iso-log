@@ -1,6 +1,8 @@
 # iso-log
 
-Isomorphic JavaScript logger with Bunyan and Sentry support.
+JavaScript logger with isomorphicity in mind.
+
+Supports Bunyan and Sentry.
 
 [![NPM](https://nodei.co/npm/@haensl%2Fiso-log.png?downloads=true)](https://nodei.co/npm/@haensl%2Fiso-log/)
 
