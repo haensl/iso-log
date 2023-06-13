@@ -210,6 +210,11 @@ jobs:
           command: |
             cp ~/iso-log/iso-log.package.test.js ./
       - run:
+          name: show package.json
+          working_directory: /tmp/test-app
+          command: |
+            cat package.json
+      - run:
           name: test module
           working_directory: /tmp/test-app
           command: |
