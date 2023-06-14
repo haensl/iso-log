@@ -87,7 +87,7 @@ iso-log offers the same API `console` does plus an `init()` function:
 
 `warn(...args)`: Log at warning log level.
 
-`init({ environment, name, sentryConfig })`: Initialize the log. (See [Configuration](#config)).
+`init({ environment, name, sentry })`: Initialize the log. (See [Configuration](#config)).
 
 ## Configuration <a name="config"></a>
 
@@ -114,8 +114,8 @@ log.init({
   // Provide Sentry configuration.
   // Object.
   // Optional.
-  // This config object is handed to Sentry: `Sentry.init(sentryConfig)`
-  sentryConfig: {
+  // This config object is handed to Sentry: `Sentry.init(sentry)`
+  sentry: {
     dsn: 'your sentry DSN here'
   }
 });
@@ -151,7 +151,7 @@ iso-log determines the runtime platform by presence/absence of a global `window`
 
 ### Report errors and warnings to [Sentry](https://sentry.io)
 
-You can provide a [`sentryConfig`](https://docs.sentry.io/platforms/node/configuration/) object to the initialization call. If you do, all `Error` objects handed to `log.error` and `log.warn` will be forwarded to Sentry.
+You can provide a [`sentry` configuration object](https://docs.sentry.io/platforms/node/configuration/) to the initialization call. If you do, all `Error` objects handed to `log.error` and `log.warn` will be forwarded to Sentry.
 
 #### Enriching errors reported to Sentry
 
@@ -250,5 +250,7 @@ You can attach additional information about the error by setting theses props on
       }
     };
     ```
+
+    See e.g. [`koa-error-middleware`](https://github.com/haensl/koa-error-middleware).
 
 ## [Changelog](CHANGELOG.md)

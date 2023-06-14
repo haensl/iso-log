@@ -81,13 +81,13 @@ const info = (...args) => {
 const init = ({
   environment,
   name,
-  sentryConfig
+  sentry
 }) => {
-  if (sentryConfig) {
+  if (sentry) {
     if (platform.hasWindow) {
-      _sentry = SentryBrowser.init(sentryConfig);
+      _sentry = SentryBrowser.init(sentry);
     } else {
-      _sentry = SentryNode.init(sentryConfig);
+      _sentry = SentryNode.init(sentry);
     }
   }
 
