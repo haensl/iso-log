@@ -1,3 +1,6 @@
+## 2.0.1
+* [#8: Fix side effect in Sentry configuration.](https://github.com/haensl/iso-log/issues/8)
+
 ## 2.0.0
 * [#6: Rename `sentryConfig` to `sentry`.](https://github.com/haensl/iso-log/issues/6)
 * Update dependencies.

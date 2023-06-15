@@ -85,9 +85,9 @@ const init = ({
 }) => {
   if (sentry) {
     if (platform.hasWindow) {
-      _sentry = SentryBrowser.init(sentry);
+      _sentry = SentryBrowser.init({ ...sentry });
     } else {
-      _sentry = SentryNode.init(sentry);
+      _sentry = SentryNode.init({ ...sentry });
     }
   }
 
