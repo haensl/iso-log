@@ -11,8 +11,8 @@ describe('iso-log', () => {
     reset = () => {
       jest.resetModules();
       haenslLog = require('@haensl/log');
-      bunyan = require('bunyan');
       log = require('./');
+      bunyan = require('bunyan');
       jest.spyOn(haenslLog, 'debug')
         .mockImplementation(() => {
           // suppress console output

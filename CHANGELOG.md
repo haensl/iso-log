@@ -1,3 +1,7 @@
+## 2.0.2
+* [#10: Improve imports.](https://github.com/haensl/iso-log/issues/10)
+* Update dependencies.
+
 ## 2.0.1
 * [#8: Fix side effect in Sentry configuration.](https://github.com/haensl/iso-log/issues/8)
 

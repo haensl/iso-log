@@ -13,11 +13,11 @@ iso-log is build with different runtime [environments](https://github.com/haensl
 
 On the server:
 
-* iso-log uses [@haensl/log](https://github.com/haensl/log) in development and [bunyan](https://www.npmjs.com/package/bunyan) on QA and production environments. If Sentry configuration is provided, iso-log will use the [`@sentry/node`](https://www.npmjs.com/package/@sentry/node) package for crash reporting.
+* iso-log uses [@haensl/log](https://github.com/haensl/log) in development and [bunyan](https://www.npmjs.com/package/bunyan) on QA and production environments (if installed). If Sentry configuration is provided and `@sentry/node` is installed, iso-log will use the [`@sentry/node`](https://www.npmjs.com/package/@sentry/node) package for crash reporting.
 
 On the client:
 
-* iso-log uses [@haensl/log](https://github.com/haensl/log). If Sentry configuration is provided, iso-log will use the [`@sentry/browser`](https://www.npmjs.com/package/@sentry/browser) package for crash reporting.
+* iso-log uses [@haensl/log](https://github.com/haensl/log). If Sentry configuration is provided, iso-log will use the [`@sentry/browser`](https://www.npmjs.com/package/@sentry/browser) package for crash reporting if installed.
 
 **Attention:** Even though the package is named _"iso-"_ and has isomorphicity, i.e. use on both server and client, in mind, the code does not come transpiled for all platforms by default. This package is exposed as a CommonJS module. The code should, however, work without problems in ESM environments. Please [file a bug](https://github.com/haensl/iso-log/issues/new/?labels=bug) if it doesn't.
 
@@ -26,18 +26,18 @@ On the client:
 ### Via `npm`
 
 ```bash
-$ npm install -S @haensl/iso-log
+$ npm install -S @haensl/iso-log @sentry/node @sentry/browser bunyan
 ```
 
 ### Via `yarn`
 
 ```bash
-$ yarn add @haensl/iso-log
+$ yarn add @haensl/iso-log @sentry/node @sentry/browser bunyan
 ```
 
 ## Usage
 
-1. [Install @haensl/iso-log](#installation)
+1. [Install @haensl/iso-log and peer dependencies](#installation)
 
 2. Use iso-log in your projects:
 
