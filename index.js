@@ -1,7 +1,4 @@
 const consoleLog = require('@haensl/log');
-const SentryNode = require('@sentry/node');
-const SentryBrowser = require('@sentry/browser');
-const bunyan = require('bunyan');
 const environments = require('@haensl/environments');
 const { platform } = require('@haensl/services');
 
@@ -85,18 +82,31 @@ const init = ({
 }) => {
   if (sentry) {
     if (platform.hasWindow) {
-      _sentry = SentryBrowser.init({ ...sentry });
+      try {
+        _sentry = require('@sentry/node').init({ ...sentry });
+      } catch (err) {
+        warn(err);
+      }
     } else {
-      _sentry = SentryNode.init({ ...sentry });
+      try {
+        _sentry = require('@sentry/browser').init({ ...sentry });
+      } catch (err) {
+        warn(err);
+      }
     }
   }
 
   if (environment === environments.development || platform.hasWindow) {
     _log = consoleLog;
   } else {
-    _log = bunyan.createLogger({
-      name
-    });
+    try {
+      _log = require('bunyan').createLogger({
+        name
+      });
+    } catch (err) {
+      _log = consoleLog;
+      warn(err);
+    }
   }
 
   while (buffer.length > 0) {
