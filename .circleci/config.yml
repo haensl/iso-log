@@ -60,7 +60,8 @@ commands:
     steps:
       - checkout
       - restore_cache:
-          keys: dependencies-{{ checksum "package-lock.json" }}
+          keys:
+            - dependencies-{{ checksum "package-lock.json" }}
       - run:
           name: install dependencies
           command: npm i
