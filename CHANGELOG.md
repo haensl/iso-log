@@ -1,3 +1,6 @@
+## 2.0.4
+* [#14: Update dependencies.](https://github.com/haensl/iso-log/issues/14)
+
 ## 2.0.3
 * [#12: Update dependencies.](https://github.com/haensl/iso-log/issues/12)
 

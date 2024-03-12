@@ -1,12 +1,12 @@
 {
   "name": "@haensl/iso-log",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "Isomorphic logger with Bunyan and Sentry support.",
   "main": "index.js",
   "scripts": {
     "lint": "eslint '**/*.js'",
     "lint:junit": "eslint --format junit -o test-results/eslint/results.xml '**/*.js'",
-    "prepare": "if [ \"${NODE_ENV}\" != 'production' ] && [ -z \"${CI}\" ]; then husky install; fi",
+    "prepare": "if [ \"${NODE_ENV}\" != 'production' ] && [ -z \"${CI}\" ]; then husky; fi",
     "test": "jest --runInBand --no-cache --colors --passWithNoTests",
     "test:junit": "jest --runInBand --no-cache --ci --reporters='default' --reporters='jest-junit' --passWithNoTests",
     "tdd": "jest --runInBand --colors --watch"
@@ -80,7 +80,7 @@
     "@sentry/node": "^7.54.0",
     "bunyan": "^1.8.15",
     "eslint": "^8.42.0",
-    "husky": "^8.0.3",
+    "husky": "^9.0.11",
     "jest": "^29.5.0",
     "jest-junit": "^16.0.0"
   }
