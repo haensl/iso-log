@@ -32,31 +32,35 @@ const error = (...args) => {
 
   if (errors.length && _sentry) {
     errors.forEach((err) => {
-      _sentry.withScope((scope) => {
-        if (err.user) {
-          scope.setUser(err.user);
-        }
+      if (typeof _sentry.withScope === 'function') {
+        _sentry.withScope((scope) => {
+          if (err.user) {
+            scope.setUser(err.user);
+          }
 
-        if (err.request) {
-          scope.setContext('request', err.request);
-        }
+          if (err.request) {
+            scope.setContext('request', err.request);
+          }
 
-        if (err.response) {
-          scope.setContext('response', err.response);
-        }
+          if (err.response) {
+            scope.setContext('response', err.response);
+          }
 
-        if (err.ctx) {
-          scope.setContext('ctx', err.ctx);
-        }
+          if (err.ctx) {
+            scope.setContext('ctx', err.ctx);
+          }
 
-        if (err.koa && err.koa.request) {
-          scope.addEventProcessor((event) =>
-            _sentry.Handlers.parseRequest(event, err.koa.request)
-          );
-        }
+          if (err.koa && err.koa.request) {
+            scope.addEventProcessor((event) =>
+              _sentry.Handlers.parseRequest(event, err.koa.request)
+            );
+          }
 
+          _sentry.captureException(err);
+        });
+      } else if (typeof _sentry.captureException === 'function') {
         _sentry.captureException(err);
-      });
+      }
     });
   }
 
@@ -145,31 +149,37 @@ const warn = (...args) => {
 
   if (errors.length && _sentry) {
     errors.forEach((err) => {
-      _sentry.withScope((scope) => {
-        if (err.user) {
-          scope.setUser(err.user);
-        }
+      if (typeof _sentry.withScope === 'function') {
+        _sentry.withScope((scope) => {
+          if (err.user) {
+            scope.setUser(err.user);
+          }
 
-        if (err.request) {
-          scope.setContext('request', err.request);
-        }
+          if (err.request) {
+            scope.setContext('request', err.request);
+          }
 
-        if (err.response) {
-          scope.setContext('response', err.response);
-        }
+          if (err.response) {
+            scope.setContext('response', err.response);
+          }
 
-        if (err.ctx) {
-          scope.setContext('ctx', err.ctx);
-        }
+          if (err.ctx) {
+            scope.setContext('ctx', err.ctx);
+          }
 
-        if (err.koa && err.koa.request) {
-          scope.addEventProcessor((event) => _sentry.Handlers.parseRequest(event, err.koa.request));
-        }
+          if (err.koa && err.koa.request) {
+            scope.addEventProcessor((event) => _sentry.Handlers.parseRequest(event, err.koa.request));
+          }
 
+          _sentry.captureException(err, {
+            level: 'warning'
+          });
+        });
+      } else if (typeof _sentry.captureException === 'function') {
         _sentry.captureException(err, {
           level: 'warning'
         });
-      });
+      }
     });
   }
 

@@ -1,3 +1,7 @@
+## 2.0.6
+* [#18: Update dependencies.](https://github.com/haensl/iso-log/issues/18)
+* Check for Sentry functions before calling.
+
 ## 2.0.5
 * [#16: Update dependencies.](https://github.com/haensl/iso-log/issues/16)
 
