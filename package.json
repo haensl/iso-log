@@ -1,6 +1,6 @@
 {
   "name": "@haensl/iso-log",
-  "version": "2.0.6",
+  "version": "2.0.7",
   "description": "Isomorphic logger with Bunyan and Sentry support.",
   "main": "index.js",
   "scripts": {
