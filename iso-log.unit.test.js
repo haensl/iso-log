@@ -1,457 +1,140 @@
-const environments = require('@haensl/environments');
-const { name } = require('./package');
+import { jest } from   '@jest/globals';
+jest.mock('@haensl/log');
 
 describe('iso-log', () => {
   let log;
-  let haenslLog;
-  let bunyan;
-  let reset;
 
-  beforeAll(() => {
-    reset = () => {
-      jest.resetModules();
-      haenslLog = require('@haensl/log');
-      log = require('./');
-      bunyan = require('bunyan');
-      jest.spyOn(haenslLog, 'debug')
-        .mockImplementation(() => {
-          // suppress console output
-        });
-      jest.spyOn(bunyan.prototype, 'debug')
-        .mockImplementation(() => {
-          // suppress console output
-        });
-      jest.spyOn(haenslLog, 'error')
-        .mockImplementation(() => {
-          // suppress console output
-        });
-      jest.spyOn(bunyan.prototype, 'error')
-        .mockImplementation(() => {
-          // suppress console output
-        });
-      jest.spyOn(haenslLog, 'info')
-        .mockImplementation(() => {
-          // suppress console output
-        });
-      jest.spyOn(bunyan.prototype, 'info')
-        .mockImplementation(() => {
-          // suppress console output
-        });
-      jest.spyOn(haenslLog, 'warn')
-        .mockImplementation(() => {
-          // suppress console output
-        });
-      jest.spyOn(bunyan.prototype, 'warn')
-        .mockImplementation(() => {
-          // suppress console output
-        });
+  beforeEach(async () => {
+    jest.resetModules();
+    const m = await import('./index.js');
+    log = m.default;
+  });
+
+  test('buffers logs before init and flushes them after init', () => {
+    const logger = {
+      debug: jest.fn(),
+      info: jest.fn(),
+      warn: jest.fn(),
+      error: jest.fn()
     };
+
+    log.debug('a');
+    log.info('b');
+    log.warn('c');
+    log.error('d');
+
+    expect(logger.debug).not.toHaveBeenCalled();
+
+    log.init({ logger });
+
+    expect(logger.debug).toHaveBeenCalledWith('a');
+    expect(logger.info).toHaveBeenCalledWith('b');
+    expect(logger.warn).toHaveBeenCalledWith('c');
+    expect(logger.error).toHaveBeenCalledWith('d');
   });
 
-  afterAll(() => {
-    jest.restoreAllMocks();
+  test('calls logger immediately after init', () => {
+    const logger = {
+      debug: jest.fn()
+    };
+
+    log.init({ logger });
+
+    log.debug('hello');
+
+    expect(logger.debug).toHaveBeenCalledWith('hello');
   });
 
-  describe('debug()', () => {
-    describe('without initialization', () => {
-      beforeEach(() => {
-        reset();
-      });
+  test('calls onError for Error instances in warn/error', () => {
+    const logger = {
+      warn: jest.fn(),
+      error: jest.fn()
+    };
 
-      it('buffers the call', () => {
-        expect(log.debug.bind(null, 'log:debug()'))
-          .not
-          .toThrow();
+    const onError = jest.fn();
 
-        expect(haenslLog.debug)
-          .not
-          .toHaveBeenCalled();
-
-        log.init({
-          environment: environments.development,
-          name
-        });
-
-        expect(haenslLog.debug)
-          .toHaveBeenCalledWith('log:debug()');
-      });
+    log.init({
+      logger,
+      onError
     });
 
-    describe('with initialization', () => {
-      beforeAll(() => {
-        reset();
-      });
+    const err = new Error('boom');
 
-      describe('development environment', () => {
-        beforeEach(() => {
-          log.init({
-            environment: environments.development,
-            name
-          });
+    log.warn('something failed', err);
+    log.error('fatal', err);
 
-          log.debug('log.debug()');
-        });
-
-        it('logs via haensl/log', () => {
-          expect(haenslLog.debug)
-            .toHaveBeenCalledWith('log.debug()');
-        });
-      });
-
-      describe('qa environment', () => {
-        beforeEach(() => {
-          log.init({
-            environment: environments.qa,
-            name
-          });
-
-          log.debug('log.debug()');
-        });
-
-        it('logs via bunyan', () => {
-          expect(bunyan.prototype.debug)
-            .toHaveBeenCalledWith('log.debug()');
-        });
-      });
-
-      describe('production environment', () => {
-        beforeEach(() => {
-          log.init({
-            environment: environments.production,
-            name
-          });
-
-          log.debug('debug log');
-        });
-
-        it('logs via bunyan', () => {
-          expect(bunyan.prototype.debug)
-            .toHaveBeenCalledWith('log.debug()');
-        });
-      });
-    });
+    expect(onError).toHaveBeenCalledTimes(2);
+    expect(onError).toHaveBeenCalledWith(err);
   });
 
-  describe('error()', () => {
-    describe('without initialization', () => {
-      beforeEach(() => {
-        reset();
-      });
+  test('does not call onError for non-error values', () => {
+    const logger = { error: jest.fn() };
+    const onError = jest.fn();
 
-      it('buffers the call', () => {
-        expect(log.error.bind(null, 'log.error()', { test: true }))
-          .not
-          .toThrow();
-
-        expect(haenslLog.error)
-          .not
-          .toHaveBeenCalled();
-
-        log.init({
-          environment: environments.development,
-          name
-        });
-
-        expect(haenslLog.error)
-          .toHaveBeenCalledWith('log.error()', { test: true });
-      });
+    log.init({
+      logger,
+      onError
     });
 
-    describe('with initialization', () => {
-      beforeAll(() => {
-        reset();
-      });
+    log.error('just a string', { foo: 'bar' });
 
-      describe('development environment', () => {
-        beforeEach(() => {
-          log.init({
-            environment: environments.development,
-            name
-          });
-
-          log.error('log.error()');
-        });
-
-        it('logs via haensl/log', () => {
-          expect(haenslLog.error)
-            .toHaveBeenCalledWith('log.error()');
-        });
-      });
-
-      describe('qa environment', () => {
-        beforeEach(() => {
-          log.init({
-            environment: environments.qa,
-            name
-          });
-
-          log.error('log.error()');
-        });
-
-        it('logs via bunyan', () => {
-          expect(bunyan.prototype.error)
-            .toHaveBeenCalledWith('log.error()');
-        });
-      });
-
-      describe('production environment', () => {
-        beforeEach(() => {
-          log.init({
-            environment: environments.production,
-            name
-          });
-
-          log.error('log.error()');
-        });
-
-        it('logs via bunyan', () => {
-          expect(bunyan.prototype.error)
-            .toHaveBeenCalledWith('log.error()');
-        });
-      });
-    });
+    expect(onError).not.toHaveBeenCalled();
   });
 
-  describe('info()', () => {
-    describe('without initialization', () => {
-      beforeEach(() => {
-        reset();
-      });
+  test('flush preserves order (FIFO)', () => {
+    const logger = {
+      info: jest.fn()
+    };
 
-      it('buffers the call', () => {
-        expect(log.info.bind(null, 'log.info()'))
-          .not
-          .toThrow();
+    log.info('1');
+    log.info('2');
+    log.info('3');
 
-        expect(haenslLog.info)
-          .not
-          .toHaveBeenCalled();
+    log.init({ logger });
 
-        log.init({
-          environment: environments.development,
-          name
-        });
-
-        expect(haenslLog.info)
-          .toHaveBeenCalledWith('log.info()');
-      });
-    });
-
-    describe('with initialization', () => {
-      beforeAll(() => {
-        reset();
-      });
-
-      describe('development environment', () => {
-        beforeEach(() => {
-          log.init({
-            environment: environments.development,
-            name
-          });
-
-          log.info('log.info()');
-        });
-
-        it('logs via haensl/log', () => {
-          expect(haenslLog.info)
-            .toHaveBeenCalledWith('log.info()');
-        });
-      });
-
-      describe('qa environment', () => {
-        beforeEach(() => {
-          log.init({
-            environment: environments.qa,
-            name
-          });
-
-          log.info('log.info()');
-        });
-
-        it('logs via bunyan', () => {
-          expect(bunyan.prototype.info)
-            .toHaveBeenCalledWith('log.info()');
-        });
-      });
-
-      describe('production environment', () => {
-        beforeEach(() => {
-          log.init({
-            environment: environments.production,
-            name
-          });
-
-          log.info('log.info()');
-        });
-
-        it('logs via bunyan', () => {
-          expect(bunyan.prototype.info)
-            .toHaveBeenCalledWith('log.info()');
-        });
-      });
-    });
+    expect(logger.info.mock.calls.map((c) => c[0])).toEqual([
+      '1',
+      '2',
+      '3'
+    ]);
   });
 
-  describe('log()', () => {
-    describe('without initialization', () => {
-      beforeEach(() => {
-        reset();
-      });
-
-      it('buffers the call', () => {
-        expect(log.log.bind(null, 'log.log()'))
-          .not
-          .toThrow();
-
-        expect(haenslLog.info)
-          .not
-          .toHaveBeenCalled();
-
-        log.init({
-          environment: environments.development,
-          name
-        });
-
-        expect(haenslLog.info)
-          .toHaveBeenCalledWith('log.log()');
-      });
-    });
-
-    describe('with initialization', () => {
-      beforeAll(() => {
-        reset();
-      });
-
-      describe('development environment', () => {
-        beforeEach(() => {
-          log.init({
-            environment: environments.development,
-            name
-          });
-
-          log.log('log.log()');
-        });
-
-        it('logs via haensl/log', () => {
-          // expect info to be called because it's an alias
-          expect(haenslLog.info)
-            .toHaveBeenCalledWith('log.log()');
-        });
-      });
-
-      describe('qa environment', () => {
-        beforeEach(() => {
-          log.init({
-            environment: environments.qa,
-            name
-          });
-
-          log.log('log.log()');
-        });
-
-        it('logs via bunyan', () => {
-          // expect info to be called because it's an alias
-          expect(bunyan.prototype.info)
-            .toHaveBeenCalledWith('log.log()');
-        });
-      });
-
-      describe('production environment', () => {
-        beforeEach(() => {
-          log.init({
-            environment: environments.production,
-            name
-          });
-
-          log.log('log.log()');
-        });
-
-        it('logs via bunyan', () => {
-          // expect info to be called because it's an alias
-          expect(bunyan.prototype.info)
-            .toHaveBeenCalledWith('log.log()');
-        });
-      });
-    });
+  test('works without logger (no crash, buffers until init)', () => {
+    expect(() => {
+      log.debug('a');
+      log.init({});
+      log.debug('b');
+    }).not.toThrow();
   });
 
-  describe('warn()', () => {
-    describe('without initialization', () => {
-      beforeEach(() => {
-        reset();
-      });
+  test('init replaces logger', () => {
+    const logger1 = { debug: jest.fn() };
+    const logger2 = { debug: jest.fn() };
 
-      it('buffers the call', () => {
-        expect(log.warn.bind(null, 'log.warn()'))
-          .not
-          .toThrow();
+    log.init({ logger: logger1 });
+    log.debug('a');
 
-        expect(haenslLog.warn)
-          .not
-          .toHaveBeenCalled();
+    log.init({ logger: logger2 });
+    log.debug('b');
 
-        log.init({
-          environment: environments.development,
-          name
-        });
+    expect(logger1.debug).toHaveBeenCalledWith('a');
+    expect(logger2.debug).toHaveBeenCalledWith('b');
+  });
 
-        expect(haenslLog.warn)
-          .toHaveBeenCalledWith('log.warn()');
-      });
-    });
+  test('supports partial logger implementations', () => {
+    const logger = {
+      error: jest.fn()
+    };
 
-    describe('with initialization', () => {
-      beforeAll(() => {
-        reset();
-      });
+    log.init({ logger });
 
-      describe('development environment', () => {
-        beforeEach(() => {
-          log.init({
-            environment: environments.development,
-            name
-          });
+    expect(() => {
+      log.debug('hello');
+      log.info('hello');
+      log.warn('hello');
+      log.error('hello');
+    }).not.toThrow();
 
-          log.warn('log.warn()');
-        });
-
-        it('logs via haensl/log', () => {
-          expect(haenslLog.warn)
-            .toHaveBeenCalledWith('log.warn()');
-        });
-      });
-
-      describe('qa environment', () => {
-        beforeEach(() => {
-          log.init({
-            environment: environments.qa,
-            name
-          });
-
-          log.warn('log.warn()');
-        });
-
-        it('logs via bunyan', () => {
-          expect(bunyan.prototype.warn)
-            .toHaveBeenCalledWith('log.warn()');
-        });
-      });
-
-      describe('production environment', () => {
-        beforeEach(() => {
-          log.init({
-            environment: environments.production,
-            name
-          });
-
-          log.warn('log.warn()');
-        });
-
-        it('logs via bunyan', () => {
-          expect(bunyan.prototype.warn)
-            .toHaveBeenCalledWith('log.warn()');
-        });
-      });
-    });
+    expect(logger.error).toHaveBeenCalledWith('hello');
   });
 });

@@ -1,3 +1,6 @@
+## 3.0.0
+* [#22: No more dependencies.](https://github.com/haensl/iso-log/issues/22)
+
 ## 2.0.7
 * [#20: Update dependencies.](https://github.com/haensl/iso-log/issues/20)
 

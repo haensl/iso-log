@@ -1,256 +1,267 @@
 # @haensl/iso-log
 
-JavaScript logger with isomorphicity in mind.
-
-Supports Bunyan and Sentry.
+A tiny isomorphic logging facade for JavaScript applications.
 
 [![NPM](https://nodei.co/npm/@haensl%2Fiso-log.png?downloads=true)](https://nodei.co/npm/@haensl%2Fiso-log/)
-
 [![npm version](https://badge.fury.io/js/@haensl%2Fiso-log.svg)](http://badge.fury.io/js/@haensl%2Fiso-log)
 [![CircleCI](https://circleci.com/gh/haensl/iso-log.svg?style=svg)](https://circleci.com/gh/haensl/iso-log)
 
-iso-log is build with different runtime [environments](https://github.com/haensl/environments) and platforms (browser vs. Node.js) in mind:
 
-On the server:
+`@haensl/iso-log` provides a single logging API that works in browsers, Node.js, and frameworks such as Next.js without introducing runtime dependencies on server-only modules.
 
-* iso-log uses [@haensl/log](https://github.com/haensl/log) in development and [bunyan](https://www.npmjs.com/package/bunyan) on QA and production environments (if installed). If Sentry configuration is provided and `@sentry/node` is installed, iso-log will use the [`@sentry/node`](https://www.npmjs.com/package/@sentry/node) package for crash reporting.
+The logger starts in a buffering mode and can be initialized later once the host application knows which logger and error reporting implementation it wants to use.
 
-On the client:
+## Features
 
-* iso-log uses [@haensl/log](https://github.com/haensl/log). If Sentry configuration is provided, iso-log will use the [`@sentry/browser`](https://www.npmjs.com/package/@sentry/browser) package for crash reporting if installed.
-
-**Attention:** Even though the package is named _"iso-"_ and has isomorphicity, i.e. use on both server and client, in mind, the code does not come transpiled for all platforms by default. This package is exposed as a CommonJS module. The code should, however, work without problems in ESM environments. Please [file a bug](https://github.com/haensl/iso-log/issues/new/?labels=bug) if it doesn't.
+- Isomorphic (Browser + Node.js)
+- No hard dependency on Bunyan, Sentry, or any other logging backend
+- Buffers log messages before initialization
+- Optional error reporting integration
+- Tiny API surface
+- ESM-first
 
 ## Installation
 
-### Via `npm`
-
 ```bash
-$ npm install -S @haensl/iso-log @sentry/node @sentry/browser bunyan
+npm install @haensl/iso-log
 ```
 
-### Via `yarn`
+## Quick Start
 
-```bash
-$ yarn add @haensl/iso-log @sentry/node @sentry/browser bunyan
+```js
+import log from '@haensl/iso-log';
+
+log.info('Application starting...');
+
+log.init();
+
+log.info('Application started.');
 ```
 
-## Usage
+## Initialization
 
-1. [Install @haensl/iso-log and peer dependencies](#installation)
+The logger can be initialized with:
 
-2. Use iso-log in your projects:
+- a custom logger implementation
+- an error reporting callback
 
-
-    ESM, i.e. `import`
-
-    ```javascript
-    import log from '@haensl/iso-log';
-
-    // iso-log needs initialization once in your app
-    log.init({
-      environment: 'production',
-      name: 'my log'
-    });
-
-    // use it like you use console.log, console.error, ...
-    log.info('Log ready for operations');
-    ```
-
-    CJS, i.e. `require`
-
-    ```javascript
-    const log = require('@haensl/iso-log');
-
-    // iso-log needs initialization once in your app
-    log.init({
-      environment: 'development',
-      name: 'my log'
-    });
-
-
-    // use it like you use console.log, console.error, ...
-    log.info('Log ready for operations');
-    ```
-
-## Synopsis
-
-iso-log offers the same API `console` does plus an `init()` function:
-
-`debug(...args)`: Log at debug log level.
-
-`error(...args)`: Log at error log level.
-
-`info(...args)`: Log at info log level.
-
-`log(...args)`: Alias for `info`.
-
-`warn(...args)`: Log at warning log level.
-
-`init({ environment, name, sentry })`: Initialize the log. (See [Configuration](#config)).
-
-## Configuration <a name="config"></a>
-
-The log needs to be initialized before first use to work properly. It will buffer calls made before the module was `init()`ialized.
-
-
-```javascript
-const log = require('@haensl/iso-log');
-const environments = require('@haensl/environments');
-
-// calls to log.error(), log.info(), log.debug(), etc are buffered until `init()` is called.
+```js
+import log from '@haensl/iso-log';
 
 log.init({
-  // Set the environment your app runs in.
-  // String.
-  // If omitted, log behaves like on production.
-  environment: environments.qa,
-
-  // Provide a name for the log.
-  // String.
-  // Optional.
-  name: 'My log',
-
-  // Provide Sentry configuration.
-  // Object.
-  // Optional.
-  // This config object is handed to Sentry: `Sentry.init(sentry)`
-  sentry: {
-    dsn: 'your sentry DSN here'
+  logger: console,
+  onError: (error) => {
+    console.error('Reporting error:', error);
   }
 });
-
-// log will process all buffered calls once it is initialized.
-
-// log is now ready for use.
 ```
 
-#### Runtime environment
+### Configuration
 
-When calling `init()`, you can provide the runtime environment via the `environment` option:
+| Option | Type | Required | Description |
+|----------|----------|----------|----------|
+| `logger` | Object | No | Logger implementation to use |
+| `onError` | Function | No | Called for every `Error` passed to `warn()` or `error()` |
 
-```javascript
-const log = require('@haensl/iso-log');
+## Logger Interface
 
+A custom logger should implement any subset of:
+
+```js
+{
+  debug(...args) {},
+  info(...args) {},
+  warn(...args) {},
+  error(...args) {}
+}
+```
+
+Methods are optional.
+
+Example:
+
+```js
 log.init({
-  environment: 'development' // Set the environment your app runs in. String.
+  logger: {
+    info: (...args) => console.log('[INFO]', ...args),
+    error: (...args) => console.error('[ERROR]', ...args)
+  }
 });
 ```
 
-Currently supported values are: `'development'`, `'qa'`, `'production'` and `'test'`.
+## Error Reporting
 
-You can use [`@haensl/environments`](https://npmjs.com/package/@haensl/environments) for convenience.
+Errors passed to `warn()` and `error()` can be forwarded to an external service.
 
-#### Platform
+```js
+log.init({
+  onError: (error) => {
+    sentry.captureException(error);
+  }
+});
+```
 
-iso-log determines the runtime platform by presence/absence of a global `window` object at the time `init()` is called:
+Example:
 
-* `window` available -> browser
-* no `window` -> server
+```js
+log.error(new Error('Something exploded'));
+```
 
+The supplied callback receives:
 
-### Report errors and warnings to [Sentry](https://sentry.io)
+```js
+Error
+```
 
-You can provide a [`sentry` configuration object](https://docs.sentry.io/platforms/node/configuration/) to the initialization call. If you do, all `Error` objects handed to `log.error` and `log.warn` will be forwarded to Sentry.
+instances only.
 
-#### Enriching errors reported to Sentry
+Non-error arguments are ignored.
 
-You can attach additional information about the error by setting theses props on the `Error` object:
+```js
+log.error(
+  'Something exploded',
+  new Error('Boom')
+);
+```
 
-* `user`: Set `error.user` to e.g. a user ID to pin the user for which the error occurred:
+Only the `Error` object is reported.
 
-    ```javascript
-    const log = require('@haensl/iso-log');
+## Buffering
 
-    // ...
+Calls made before initialization are buffered.
 
-    try {
-      const data = await user.getData();
-    } catch (error) {
-      // Attach user id to the error.
-      error.user = user.id;
-      log.error('Failing to retrieve user data', error);
-    }
-    ```
+```js
+log.info('A');
+log.info('B');
+log.info('C');
 
-* `request`: Set `error.request` to provide information about any network request the error pertains to.
+log.init({
+  logger: console
+});
+```
 
-    ```javascript
-    const log = require('@haensl/iso-log');
+The buffered messages are flushed in FIFO order:
 
-    // ...
+```text
+A
+B
+C
+```
 
-    try {
-      const data = await getData();
-    } catch (error) {
-      // Attach request information.
-      error.request = {
-        url: 'https://url.to.data'
-      };
+This makes it safe to log during application startup before logging infrastructure has been configured.
 
-      log.error('Failing to retrieve data', error);
-    }
-    ```
+## API
 
-* `response`: Set `error.response` to provide information about any network responses associated with the error.
+### `log.init(options?)`
 
-    ```javascript
-    const log = require('@haensl/iso-log');
-    const fetch = require('node-fetch');
+Initialize the logger.
 
-    // ...
+```js
+log.init({
+  logger,
+  onError
+});
+```
 
-    const response = await fetch(apiRequest);
+### `log.debug(...args)`
 
-    if (!response.ok) {
-      const error = new Error('API request failing');
+Write a debug message.
 
-      error.response = {
-        status: response.status,
-        statusText: response.statusText,
-        body: typeof response.text === 'function' ? await response.text() : undefined
-      }
+```js
+log.debug('Loading user', userId);
+```
 
-      log.error(error);
-    }
-    ```
+### `log.info(...args)`
 
-* `ctx`: Provide additional context to the error by adding props to `error.ctx`.
+Write an informational message.
 
-    ```javascript
-    const log = require('@haensl/iso-log');
-    const fetch = require('node-fetch');
+```js
+log.info('Server started');
+```
 
-    try {
+### `log.warn(...args)`
 
-    } catch (error) {
-      // Provide any additional helpful data in `error.ctx` to give context to the error.
-      error.ctx = {
-        userInput: 'inputValue',
-        foo: 1
-      };
+Write a warning.
 
-      log.error(error);
-    }
-    ```
+Errors are forwarded to `onError`.
 
-* `koa`: If you're using [Koa](https://koajs.com/), iso-log will try to pull context information from `error.koa`.
+```js
+log.warn(
+  'Unexpected response',
+  new Error('Invalid payload')
+);
+```
 
-    ```javascript
-    const log = require('@haensl/iso-log');
+### `log.error(...args)`
 
-    // Example error middleware
-    const errorMiddleware = () => async (ctx, next) => {
-      try {
-        await next();
-      } catch (error) {
-        error.koa = ctx;
+Write an error.
 
-        log.error(error);
-      }
-    };
-    ```
+Errors are forwarded to `onError`.
 
-    See e.g. [`koa-error-middleware`](https://github.com/haensl/koa-error-middleware).
+```js
+log.error(
+  'Request failed',
+  new Error('Connection refused')
+);
+```
+
+## Bunyan Example
+
+```js
+import bunyan from 'bunyan';
+import log from '@haensl/iso-log';
+
+log.init({
+  logger: bunyan.createLogger({
+    name: 'api'
+  })
+});
+```
+
+## Sentry Example
+
+```js
+import * as Sentry from '@sentry/node';
+import log from '@haensl/iso-log';
+
+Sentry.init({
+  dsn: process.env.SENTRY_DSN
+});
+
+log.init({
+  logger: console,
+  onError: Sentry.captureException
+});
+```
+
+## Next.js Example
+
+Client:
+
+```js
+import * as Sentry from '@sentry/nextjs';
+import log from '@haensl/iso-log';
+
+log.init({
+  onError: Sentry.captureException
+});
+```
+
+Server:
+
+```js
+import bunyan from 'bunyan';
+import * as Sentry from '@sentry/nextjs';
+import log from '@haensl/iso-log';
+
+log.init({
+  logger: bunyan.createLogger({
+    name: 'web'
+  }),
+  onError: Sentry.captureException
+});
+```
 
 ## [Changelog](CHANGELOG.md)
+
+## [License](LICENSE)

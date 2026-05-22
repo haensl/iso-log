@@ -230,11 +230,10 @@ jobs:
       - attach_workspace:
           at: ~/iso-log
       - run:
-          name: setup npm registry token
-          command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
-      - run:
           name: publish node module
-          command: npm publish --access public
+          command: |
+            export NPM_ID_TOKEN=$(circleci run oidc get --claims '{"aud": "npm:registry.npmjs.org"}')
+            npm publish --access public
 
   publish-github-release:
     docker:
