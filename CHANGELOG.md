@@ -1,3 +1,6 @@
+## 3.0.1
+* [#24: Fix postinstall.](https://github.com/haensl/iso-log/issues/24)
+
 ## 3.0.0
 * [#22: No more dependencies.](https://github.com/haensl/iso-log/issues/22)
 
