@@ -163,7 +163,6 @@ jobs:
             - iso-log.package.test.js
             - index.mjs
             - index.cjs
-            - iso-log.js
             - .npmignore
             - haensl-iso-log.tgz
 
