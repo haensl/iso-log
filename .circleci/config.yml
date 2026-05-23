@@ -161,7 +161,9 @@ jobs:
             - package.json
             - package-lock.json
             - iso-log.package.test.js
-            - index.js
+            - index.mjs
+            - index.cjs
+            - iso-log.js
             - .npmignore
             - haensl-iso-log.tgz
 
