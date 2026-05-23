@@ -1,6 +1,6 @@
 {
   "name": "@haensl/iso-log",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Isomorphic logger with Bunyan and Sentry support.",
   "type": "module",
   "exports": {
@@ -12,7 +12,7 @@
     "lint": "eslint '**/*.js'",
     "lint:junit": "eslint --format junit -o test-results/eslint/results.xml '**/*.js'",
     "precommit": "npm run lint && npm test",
-    "postinstall": "if [ \"${NODE_ENV}\" != 'production' ] && [ -z \"${CI}\" ]; then ./setup-hooks.sh; fi",
+    "setup": "./setup-hooks.sh",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --no-cache --colors --passWithNoTests",
     "test:junit": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --no-cache --ci --reporters='default' --reporters='jest-junit' --passWithNoTests",
     "tdd": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --colors --watch"
@@ -49,7 +49,7 @@
   "author": {
     "name": "HP Dietz",
     "url": "https://hpdietz.com",
-    "twitter": "@h_p_d"
+    "email": "h.p.dietz@gmail.com"
   },
   "funding": "https://github.com/sponsors/haensl",
   "license": "MIT",
