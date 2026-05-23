@@ -1,11 +1,13 @@
 describe('@haensl/iso-log', () => {
-  beforeEach(() => {
+  let log;
+
+  beforeEach(async () => {
     jest.resetModules();
+    const m = await import('@haensl/iso-log');
+    log = m.default;
   });
 
   describe('import via full uri', () => {
-    const log = require('@haensl/iso-log');
-
     it('exposes an error function', () => {
       expect(typeof log.error)
       .toEqual('function');
@@ -33,9 +35,9 @@ describe('@haensl/iso-log', () => {
   });
 
   describe('spread import', () => {
-    const { init }  = require('@haensl/iso-log');
-
-    it('exposes an init function', () => {
+    it('exposes an init function', async () => {
+      const m = await import('@haensl/iso-log');
+      const { init }  = m.default;
       expect(typeof init)
         .toEqual('function');
     });
