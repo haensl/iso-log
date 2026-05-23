@@ -1,3 +1,6 @@
+## 3.1.2
+* [#28: Fix bundle.](https://github.com/haensl/iso-log/issues/28)
+
 ## 3.1.1
 * [#28: Fix bundle.](https://github.com/haensl/iso-log/issues/28)
 
