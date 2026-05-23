@@ -104,7 +104,7 @@ commands:
           name: add test command
           working_directory: /tmp/test-app
           command: |
-            npm pkg set scripts.test='jest --runInBand --no-cache --ci'
+            npm pkg set scripts.test='node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --no-cache --ci'
 
 jobs:
   lint:
