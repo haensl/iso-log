@@ -1,3 +1,6 @@
+## 3.1.0
+* [#26: Provide CJS and ESM exports.](https://github.com/haensl/iso-log/issues/26)
+
 ## 3.0.1
 * [#24: Fix postinstall.](https://github.com/haensl/iso-log/issues/24)
 

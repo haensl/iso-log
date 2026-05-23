@@ -6,7 +6,7 @@ describe('iso-log', () => {
 
   beforeEach(async () => {
     jest.resetModules();
-    const m = await import('./index.js');
+    const m = await import('./index');
     log = m.default;
   });
 
