@@ -1,3 +1,6 @@
+## 3.1.1
+* [#28: Fix bundle.](https://github.com/haensl/iso-log/issues/28)
+
 ## 3.1.0
 * [#26: Provide CJS and ESM exports.](https://github.com/haensl/iso-log/issues/26)
 
